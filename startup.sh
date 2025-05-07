@@ -6,7 +6,7 @@ cleanup() {
 	screen -S openSenseMap -X quit
 
 	# attempt to kill any fingerprinting processes still running (should be done)
-	ps aux | grep "SCREEN -dmS fingerprinting" | column 2 | awk '{print $2}' | xargs kill
+	ps aux | grep "SCREEN -dmS fingerprinting" | awk '{print $2}' | xargs sudo kill
 	exit
 }
 

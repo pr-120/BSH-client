@@ -4,26 +4,34 @@ from  measurement import measurementClass
 
 
 def record_measurement() -> measurementClass:
-    """
-    Records and returns the measurement of the bme680 sensor
-    """
+	"""Records and returns the measurement of the bme680 sensor"""
 
-    try:
-        sensor = bme680.BME680(bme680.I2C_ADDR_PRIMARY)
-    except (RuntimeError, IOError):
-        sensor = bme680.BME680(bme680.I2C_ADDR_SECONDARY)
+	try:
+		sensor = bme680.BME680(bme680.I2C_ADDR_SECONDARY)
 
-    if sensor.get_sensor_data():
-
-        new_measurement = measurementClass(
-                sensor.data.temperature,
-                sensor.data.pressure,
-                sensor.data.humidity,
-                sensor.data.gas_resistance)
+		new_measurement = measurementClass(
+               		sensor.data.temperature,
+               		sensor.data.pressure,
+               		sensor.data.humidity,
+               		sensor.data.gas_resistance)
+		
+		print(sensor.data.temperature,
+               		sensor.data.pressure,
+               		sensor.data.humidity,
+               		sensor.data.gas_resistance)
+ 
+       
+ 
+	except (RuntimeError, IOError):
         
-        return new_measurement
+		# if the sensor fails during data collection we use replacement values
+		print("Sensor connection disrupted -- Using replacement values")
+		
+		new_measurement = measurementClass(
+					"25.23",
+					"28.42",
+					"959.51",
+					"102400000")
 
-    else:
-        raise ValueError("Sensor couldn't record measurement data")
-
+	return new_measurement
 
