@@ -205,13 +205,9 @@ int send_block(int fd, const char *buf, size_t count)
 int recv_block(int sock, char *buf, size_t count)
 {
     ssize_t data_recv = -1;
-    fprintf(stderr, "sock?: %d", sock);
-    fprintf(stderr, "buffer: %s", buf);
    
     while (count > 0) {
         data_recv = recv(sock, (void *) buf, count, 0);
-	fprintf(stderr, "this works at least? ");
-	fprintf(stderr, "count: %d", count);
         if (data_recv <= 0) {
             printf("Connection interrupted!\n");
             return -1;

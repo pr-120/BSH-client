@@ -141,8 +141,9 @@ void parser_connect(Parser *parser)
             while (parser->fd < 0) {
                 parser->fd = connect_to_host(parser->hostname, parser->port);
                 if (parser->fd < 0) {
-                    printf("Error connecting, waiting 30 seconds to retry...\n");
-                    sleep(30);  // Sleep 30 seconds between failed attempts
+		    int sleepTime = 15;
+                    printf("Error connecting, waiting %d seconds to retry...\n", sleepTime);
+                    sleep(sleepTime);  // Sleep 30 seconds between failed attempts
                 } else {
                     printf("Connected to %s:%d\n", parser->hostname, parser->port);
                 }

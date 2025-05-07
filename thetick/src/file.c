@@ -30,7 +30,6 @@
 // "burstDuration" determines how many sends are done before taking a longer pause determined by "pauseDuration"
 int copy_stream(int source, int destination, ssize_t count, const config_t *config)
 {
-	fprintf(stderr, "bufferSize: %d, transfer_frequency: %d, burstDuration: %d, burstPause: %d", config->bufferSize, config->transferFrequency, config->burstDuration,config->burstPause);
 	char *buffer = malloc(config->bufferSize);
 	if (!buffer) {
 		return -1;

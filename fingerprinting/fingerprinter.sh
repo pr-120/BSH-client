@@ -7,8 +7,14 @@
 #############		SCRIPT CONFIGURATION		##############
 ##############################################################
 # C2 server and port to push data
-server="192.168.189.10"
-port="5000"
+
+# load app data
+SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+. $SCRIPT_DIR/../config/app_data.config
+
+server=$ip_of_server
+port=$port_of_api
+
 route="/fp/"
 mac=$( cat /sys/class/net/eth0/address | tr : _ ) # find MAC address and replace ":" with "_" for usage in route
 
@@ -151,7 +157,7 @@ do
 	#echo "Swap: ${swapSamples}"
 	#echo "Network: ${networkTraffic}"
 	echo "$dt"
-	echo "$finalOutput" >> "fp-$dt.txt"
+	#echo "$finalOutput" >> "fp-$dt.txt"
 	newRate="$(cat ./rate.roar)"
 	lastRate=$([ -z "$newRate" ] && echo "$lastRate" || echo "$newRate") # do not assign empty newRate
 	# echo -e "\n-- $lastRate" >> "fp-$dt.txt" # -e enables backslash escapes
