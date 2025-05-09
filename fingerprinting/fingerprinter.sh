@@ -85,10 +85,11 @@ do
 	timestamp=$(($(date +%s%N)/1000000))
 
 	#	First capture for network resources, results will be calculated as the difference between this capture and the one taken later
-	#if [ "$resourceMonitor" = true ]
-	#then
-		#oldNetworkTraffic=$(ifconfig | grep -oP -e "bytes \K\w+" | head -n 4)
-	#fi
+	nameOfActiveInterface=$(ip addr show | grep -w $(hostname -I) | awk '{print $NF}')
+	if [ "$resourceMonitor" = true ]
+	then
+		oldNetworkTraffic=$(ifconfig $nameOfActiveInterface| grep -oP -e "bytes \K\w+")
+	fi
 
 	#	Perf will monitor the events and also act as a "sleep" between both network captures
 	tempOutput=$( perf stat --log-fd 1 -e "$targetEvents" -a sleep "$timeWindowSeconds" )
@@ -96,8 +97,8 @@ do
 
 	if [ "$resourceMonitor" = true ]
 	then
-		#	capture of network resources
-		networkStats=$(ifconfig | grep -oP -e "bytes \K\w+" | head -n 4)
+		#	Second capture of network resources
+		newNetworkTraffic=$(ifconfig $nameOfActiveInterface | grep -oP -e "bytes \K\w+")
 
 		#	Capture with top for CPU usage, tasks, and RAM usage
 		topResults=$(top -bn 2 -d 1)
@@ -115,7 +116,7 @@ do
 	if [ "$resourceMonitor" = true ]
 	then
 		#	Network data fingerprint
-		networkTraffic=$(echo "$networkStats" | paste -sd "," -)
+		networkTraffic="$(paste <(echo "$newNetworkTraffic") <(echo "$oldNetworkTraffic") | awk 'BEGIN { ORS = "," }{ print $1 - $2 }' | sed 's/,$//')"
 
 		#	Data extraction from top results
 		cpuSamples=$(echo "$topResults" | grep -i "^%Cpu(s):" | tail -n 1 | tr -s " " | tr "," "." | cut -d " " -f 2,4,6,8,10,12,14 --output-delimiter=",")
@@ -151,13 +152,13 @@ do
 	#	PUSH to C2 server (and store locally)
 	finalOutput="$timeAccumulative,$timestamp,$seconds,$connectivity,${resourceSample}${temperatureSample}$sample"
 	dt=$(date +%Y-%m-%d_%H-%M-%S)
-	#echo "CPU: ${cpuSamples}"
-	#echo "tasks: ${taskSamples}"
-	#echo "RAM: ${ramSamples}"
-	#echo "Swap: ${swapSamples}"
-	#echo "Network: ${networkTraffic}"
+	echo "CPU: ${cpuSamples}"
+	echo "tasks: ${taskSamples}"
+	echo "RAM: ${ramSamples}"
+	echo "Swap: ${swapSamples}"
+	echo "Network: ${networkTraffic}"
 	echo "$dt"
-	#echo "$finalOutput" >> "fp-$dt.txt"
+	echo "$finalOutput" >> "fp-$dt.txt"
 	newRate="$(cat ./rate.roar)"
 	lastRate=$([ -z "$newRate" ] && echo "$lastRate" || echo "$newRate") # do not assign empty newRate
 	# echo -e "\n-- $lastRate" >> "fp-$dt.txt" # -e enables backslash escapes
