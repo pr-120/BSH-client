@@ -20,3 +20,6 @@ cd $tick_backdoor_folder/src
 make clean
 make
 
+
+# install packages for sensor
+sudo apt-get install i2c-tools
