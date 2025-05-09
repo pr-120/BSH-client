@@ -1,0 +1,8 @@
+./fingerprinting/.venv
+
+# ignore all fingerprint files
+fp-*
+
+# ignore all virtual environments and caches
+.venv
+__pycache__
