@@ -2,7 +2,7 @@ import datetime
 from send_to_server import send_measurements_to_server
 import time
 
-RATE_LIMITS_TIME = 10 
+RATE_LIMITS_TIME = 20 
 
 def main() -> None:
     """
