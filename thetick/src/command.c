@@ -187,7 +187,7 @@ void do_file_read(Parser *p)
 	// Close the connection if something goes wrong at this point.
 	printf("Reading file %s\n", filename);
 	parser_begin_response(p, CMD_STATUS_OK, info.st_size);
-	if (copy_stream(file, p->fd, info.st_size, &config) < 0) {
+	if (configurable_copy_stream(file, p->fd, info.st_size, &config) < 0) {
 		parser_close(p);
 		printf("Error sending file (%ld bytes)\n", info.st_size);
 	} else {
@@ -239,22 +239,9 @@ void do_file_write(Parser *p)
 	chmod(filename, 0777);
 	
 	
-	config_t config;
-
-	char *cfg_id = get_current_config();
-	int config_load_status = load_config(cfg_id, &config);
-	
-	// loads the config used currently into the config struct 
-	if (!cfg_id || config_load_status != 0) {
-		fprintf(stderr, "\nFailed to read config\n");
-		free(cfg_id);
-		return;
-	}
-	free(cfg_id); // free after successful load
-
 	// Save the file data as it comes from the socket.
 	printf("Writing file %s\n", filename);
-	success = copy_stream(p->fd, file, p->header.data_len, &config);
+	success = copy_stream(p->fd, file, p->header.data_len);
 	close(file);
 	if (success < 0) {
 		printf("Error receiving file (%d bytes)\n", p->header.data_len);
@@ -466,32 +453,19 @@ void do_tcp_pivot(Parser *p)
 	}
 
 	// Send the OK status before launching the tunnel, since we'll be reusing the channel.
-	parser_ok(p);
-	
-	config_t config;
-
-	char *cfg_id = get_current_config();
-	fprintf(stderr, "%s", cfg_id);
-
-	// loads the config used currently into the config struct 
-	if (!cfg_id || load_config(cfg_id, &config) != 0) {
-		fprintf(stderr, "Failed to read config\n");
-		free(cfg_id);
-		return;
-	}
-	free(cfg_id); // free after successful load
+	parser_ok(p);	
 
 	// Fork the process twice.
 	if (fork() == 0) {
 		if (fork() == 0) {
 
 			// The first process will handle the source to destination data.
-			copy_stream(p->fd, sock, -1, &config);
+			copy_stream(p->fd, sock, -1);
 
 		} else {
 
 			// The second process will handle the destination to source data.
-			copy_stream(sock, p->fd, -1, &config);
+			copy_stream(sock, p->fd, -1);
 
 		}
 
