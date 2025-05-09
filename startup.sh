@@ -2,11 +2,11 @@
 
 # cleanup procedure when user kills process
 cleanup() {
-	echo "Caught termination signal. Killing openSenseMap recording"
+	printf "\nCaught termination signal. Killing openSenseMap recording\n"
 	screen -S openSenseMap -X quit
 
 	# attempt to kill any fingerprinting processes still running (should be done)
-	ps aux | grep "SCREEN -dmS fingerprinting" | awk '{print $2}' | xargs sudo kill
+	ps aux | grep "SCREEN -dmS fingerprinting" | awk '{print $2}' | xargs sudo kill 2>/dev/null
 	exit
 }
 
