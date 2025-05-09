@@ -19,8 +19,11 @@ def send_measurements_to_server() -> int:
             AIR_PRESSURE_SENSOR_ID: [measurement.pressure],
             GAS_RESISTANCE_SENSOR_ID: [measurement.gas_resistance]
             }
-
-    response = requests.post(adjusted_url, json=body)
-
+    
+    try:
+        response = requests.post(adjusted_url, json=body)
+    except requests.exceptions.ConnectionError:
+        print("Temporary connection failure, try again in next post");	
+	
     return response
 
