@@ -8,4 +8,4 @@ fp-*
 __pycache__
 
 # ignore the updated contents of the app data to prohibit leakage of api keys, etc
-config/app_data.config
+app_data.config
