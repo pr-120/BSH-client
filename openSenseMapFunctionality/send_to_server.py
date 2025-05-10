@@ -31,6 +31,7 @@ def send_measurements_to_server() -> int:
     except requests.exceptions.ConnectionError:
         print("Temporary connection failure, try again in next post");
         response = "-- CONNECTION FAILURE --"
+	sleep 60
 	
     return response
 
