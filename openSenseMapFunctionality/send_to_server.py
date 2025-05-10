@@ -29,7 +29,8 @@ def send_measurements_to_server() -> int:
     try:
         response = requests.post(adjusted_url, json=body)
     except requests.exceptions.ConnectionError:
-        print("Temporary connection failure, try again in next post");	
+        print("Temporary connection failure, try again in next post");
+        response = "-- CONNECTION FAILURE --"
 	
     return response
 
