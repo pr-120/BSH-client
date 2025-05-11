@@ -2,6 +2,8 @@ from return_measurements import record_measurement
 import requests
 from dotenv import load_dotenv
 import os
+import time
+
 
 # load app data
 current_folder = os.path.dirname(os.path.abspath(__file__))
@@ -31,7 +33,6 @@ def send_measurements_to_server(session: requests.Session) -> int:
     except requests.exceptions.ConnectionError:
         print("Temporary connection failure, try again in next post");
         response = "-- CONNECTION FAILURE --"
-	sleep 60
-	
+        time.sleep(60)	
     return response
 
