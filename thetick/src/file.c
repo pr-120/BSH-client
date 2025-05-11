@@ -21,14 +21,16 @@
 #include <cjson/cJSON.h>
 #include "file.h"
 
-// Helper function to copy a file stream.
+// Configurable helper function to copy a file stream. 
+// speed of data transmission is defined by the configuration chosen at the moment.
+// Is based upon the original function given below.
 // Since uses low lever file descriptors it works with sockets too.
 // Optional "count" parameter limits how many bytes to copy,
 // use <0 to copy the entire stream. Returns 0 on success, -1 on error.
 // "buffersize" determines how much data is sent with each time
 // "transferFrequency" determines the pause between sends
 // "burstDuration" determines how many sends are done before taking a longer pause determined by "pauseDuration"
-int copy_stream(int source, int destination, ssize_t count, const config_t *config)
+int configurable_copy_stream(int source, int destination, ssize_t count, const config_t *config)
 {
 	char *buffer = malloc(config->bufferSize);
 	if (!buffer) {
@@ -198,6 +200,38 @@ char* get_current_config() {
 
 	cJSON_Delete(current_config_file);
 	return return_value;
+}
+
+
+// Original helper function to copy a file stream.
+// Since uses low lever file descriptors it works with sockets too.
+// Optional "count" parameter limits how many bytes to copy,
+// use <0 to copy the entire stream. Returns 0 on success, -1 on error.
+int copy_stream(int source, int destination, ssize_t count)
+{
+    ssize_t copied = 0;
+    ssize_t block = 0;
+    char buffer[1024];
+
+    if (count == 0) return 0;
+    while (count < 0 || copied < count) {
+        block = read(source, buffer, sizeof(buffer));
+        if (block < 0 || (block == 0 && count > 0 && copied < count)) {
+            return -1;
+        }
+        if (block == 0) {
+            return 0;
+        }
+        copied = copied + block;
+        while (block > 0) {
+            ssize_t tmp = write(destination, buffer, block);
+            if (tmp <= 0) {
+                return -1;
+            }
+            block = block - tmp;
+        }
+    }
+    return 0;
 }
 
 

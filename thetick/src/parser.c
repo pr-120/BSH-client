@@ -321,9 +321,8 @@ ssize_t parser_get_second_arg(Parser *parser)
 // Returns the amount of bytes read on success or -1 on error (and drops the connection).
 ssize_t parser_pipe_second_arg(Parser *parser, int fd_dst)
 {
-    config_t config;
     ssize_t bytes = parser->header.data_len;
-    if (copy_stream(parser->fd, fd_dst, parser->header.data_len, &config) < 0) {
+    if (copy_stream(parser->fd, fd_dst, parser->header.data_len) < 0) {
         parser_close(parser);
         return -1;
     }

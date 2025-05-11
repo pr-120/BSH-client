@@ -158,7 +158,7 @@ do
 	echo "Swap: ${swapSamples}"
 	echo "Network: ${networkTraffic}"
 	echo "$dt"
-	echo "$finalOutput" >> "fp-$dt.txt"
+	#echo "$finalOutput" >> "fp-$dt.txt"
 	newRate="$(cat ./rate.roar)"
 	lastRate=$([ -z "$newRate" ] && echo "$lastRate" || echo "$newRate") # do not assign empty newRate
 	# echo -e "\n-- $lastRate" >> "fp-$dt.txt" # -e enables backslash escapes

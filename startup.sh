@@ -38,7 +38,7 @@ trap cleanup SIGINT SIGTERM
 
 
 # start benign behavior
-screen -dmS openSenseMap $openSenseMap_folder/start_openSenseMap_recording.sh
+screen -dmS openSenseMap -L -Logfile ./logfile.txt $openSenseMap_folder/start_openSenseMap_recording.sh
 
 # start additional benign behavior if option given
 if [ "$benign_process_active" = true ]; then
