@@ -13,7 +13,7 @@ TEMPERATURE_SENSOR_ID = os.getenv("temperature_sensor_id")
 AIR_PRESSURE_SENSOR_ID = os.getenv("air_pressure_sensor_id")
 GAS_RESISTANCE_SENSOR_ID = os.getenv("gas_resistance_sensor_id")
 
-def send_measurements_to_server() -> int:
+def send_measurements_to_server(session: requests.Session) -> int:
 
     opensensemap_url = "https://api.opensensemap.org/boxes/"
     adjusted_url = opensensemap_url + SENSE_BOX_ID + "/data"
@@ -27,7 +27,7 @@ def send_measurements_to_server() -> int:
             }
     
     try:
-        response = requests.post(adjusted_url, json=body)
+        response = session.post(adjusted_url, json=body)
     except requests.exceptions.ConnectionError:
         print("Temporary connection failure, try again in next post");
         response = "-- CONNECTION FAILURE --"

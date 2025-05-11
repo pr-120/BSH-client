@@ -1,6 +1,7 @@
 import datetime
 from send_to_server import send_measurements_to_server
 import time
+import requests
 
 RATE_LIMITS_TIME = 20 
 
@@ -9,9 +10,11 @@ def main() -> None:
     Runs main process of recording and sending measurements to the OpenSenseMap.
     live sensor measurements every ten seconds due to rate limits
     """
-
+    # create a single TCP connection
+    session = requests.Session()
+    
     while True:
-        response = send_measurements_to_server()
+        response = send_measurements_to_server(session)
 
         print(response, datetime.datetime.now())
         
@@ -20,5 +23,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
 

