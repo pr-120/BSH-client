@@ -31,7 +31,11 @@ trap cleanup SIGINT SIGTERM
 . ./config/folder_paths.config
 
 # load app data
-. ./config/app_data.config
+{
+	. ./config/app_data.config
+} || { 
+	printf "\nPlease adjust the data in 'config/preliminary_app_data.config' and rename to 'config/app_data.config'.\n" && exit
+}
 
 ######################################################
 
