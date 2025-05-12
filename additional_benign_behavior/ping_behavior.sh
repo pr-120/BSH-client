@@ -1,8 +1,10 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+
 while true; do
 	
-	for line in $(cat "link_file.txt"); do
+	for line in $(cat "$SCRIPT_DIR/link_file.txt"); do
 		# send requests to sites to simulate network usage
 		curl -s "$line" > /dev/null
 		sleep 0.3

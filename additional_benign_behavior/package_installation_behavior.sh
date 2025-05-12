@@ -1,11 +1,13 @@
 #!/bin/bash
 
-path_to_requirements="./requirements.txt"
+SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+
+path_to_requirements="$SCRIPT_DIR/requirements.txt"
 
 # create and activate virtual environment
 echo "activating env..."
-python3 -m venv ./venv
-source ./venv/bin/activate
+python3 -m venv $SCRIPT_DIR/.venv
+source $SCRIPT_DIR/.venv/bin/activate
 echo "done"
 
 while true; do
