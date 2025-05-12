@@ -3,14 +3,14 @@
 # cleanup procedure when user kills process
 cleanup() {
 	printf "\nCaught termination signal. Killing openSenseMap recording\n"
-	screen -S openSenseMap -X quit
+	screen -ls | grep "openSenseMap" | awk '{print $1}' | xargs -r kill
 
 	# attempt to kill any fingerprinting processes still running (should be done)
 	ps aux | grep "SCREEN -dmS fingerprinting" | awk '{print $2}' | xargs sudo kill 2>/dev/null
 	exit
 }
 
-# Traü SIGINT (Ctrl+C) and SIGTERM
+# Trap SIGINT (Ctrl+C) and SIGTERM
 trap cleanup SIGINT SIGTERM
 
 # load folder paths
