@@ -17,7 +17,7 @@ shift $((OPTIND-1))
 # cleanup procedure when user kills process
 cleanup() {
 	printf "\nCaught termination signal. Killing openSenseMap recording\n"
-	screen -S openSenseMap -X quit
+	screen -ls | grep "openSenseMap" | awk '{print $1}' | xargs -r -I {} screen -S {} -X quit
 
 	# attempt to kill any fingerprinting processes still running (should be done)
 	ps aux | grep "SCREEN -dmS fingerprinting" | awk '{print $2}' | xargs sudo kill 2>/dev/null
