@@ -34,7 +34,7 @@ timeWindowSeconds=5
 #	Set language to make sure same separator (, and .) config is being used
 export LC_ALL=C.UTF-8
 #	Events to monitor using perf
-targetEvents="alarmtimer:alarmtimer_fired,alarmtimer:alarmtimer_start,block:block_bio_backmerge,block:block_bio_remap,block:block_dirty_buffer,block:block_getrq,block:block_touch_buffer,block:block_unplug,clk:clk_set_rate,cpu-migrations,cs,dma_fence:dma_fence_init,fib:fib_table_lookup,filemap:mm_filemap_add_to_page_cache,gpio:gpio_value,ipi:ipi_raise,irq:irq_handler_entry,irq:softirq_entry,jbd2:jbd2_handle_start,jbd2:jbd2_start_commit,kmem:kfree,kmem:kmalloc,kmem:kmem_cache_alloc,kmem:kmem_cache_free,kmem:mm_page_alloc,kmem:mm_page_alloc_zone_locked,kmem:mm_page_free,kmem:mm_page_pcpu_drain,mmc:mmc_request_start,net:net_dev_queue,net:net_dev_xmit,net:netif_rx,page-faults,pagemap:mm_lru_insertion,qdisc:qdisc_dequeue,qdisc:qdisc_dequeue,raw_syscalls:sys_enter,raw_syscalls:sys_exit,rpm:rpm_resume,rpm:rpm_suspend,sched:sched_process_exec,sched:sched_process_free,sched:sched_process_wait,sched:sched_switch,sched:sched_wakeup,signal:signal_deliver,signal:signal_generate,skb:consume_skb,skb:consume_skb,skb:kfree_skb,skb:kfree_skb,skb:skb_copy_datagram_iovec,sock:inet_sock_set_state,task:task_newtask,tcp:tcp_destroy_sock,tcp:tcp_probe,timer:hrtimer_start,timer:timer_start,udp:udp_fail_queue_rcv_skb,workqueue:workqueue_activate_work, syscalls:sys_enter_connect, syscalls:sys_exit_connect, syscalls:sys_enter_sendto, syscalls:sys_exit_sendto"
+targetEvents="alarmtimer:alarmtimer_fired,alarmtimer:alarmtimer_start,block:block_bio_backmerge,block:block_bio_remap,block:block_dirty_buffer,block:block_getrq,block:block_touch_buffer,block:block_unplug,clk:clk_set_rate,cpu-migrations,cs,dma_fence:dma_fence_init,fib:fib_table_lookup,filemap:mm_filemap_add_to_page_cache,gpio:gpio_value,ipi:ipi_raise,irq:irq_handler_entry,irq:softirq_entry,jbd2:jbd2_handle_start,jbd2:jbd2_start_commit,kmem:kfree,kmem:kmalloc,kmem:kmem_cache_alloc,kmem:kmem_cache_free,kmem:mm_page_alloc,kmem:mm_page_alloc_zone_locked,kmem:mm_page_free,kmem:mm_page_pcpu_drain,mmc:mmc_request_start,net:net_dev_queue,net:net_dev_xmit,net:netif_rx,page-faults,pagemap:mm_lru_insertion,qdisc:qdisc_dequeue,qdisc:qdisc_dequeue,raw_syscalls:sys_enter,raw_syscalls:sys_exit,rpm:rpm_resume,rpm:rpm_suspend,sched:sched_process_exec,sched:sched_process_free,sched:sched_process_wait,sched:sched_switch,sched:sched_wakeup,signal:signal_deliver,signal:signal_generate,skb:consume_skb,skb:consume_skb,skb:kfree_skb,skb:kfree_skb,skb:skb_copy_datagram_iovec,sock:inet_sock_set_state,task:task_newtask,tcp:tcp_destroy_sock,tcp:tcp_probe,timer:hrtimer_start,timer:timer_start,udp:udp_fail_queue_rcv_skb,workqueue:workqueue_activate_work"
 #	Initialize total time monitored (NOT TAKING INTO CONSIDERATION TIME BETWEEN SCREENSHOTS)
 timeAccumulative=0
 
@@ -89,6 +89,10 @@ do
 	if [ "$resourceMonitor" = true ]
 	then
 		oldNetworkTraffic=$(ifconfig $nameOfActiveInterface| grep -oP -e "bytes \K\w+")
+		oldTcpCounter=$(nstat | awk '/TcpActiveOpens/ {print $2}')
+		oldTcpOut=$(nstat | awk '/TcpOutSegs/ {print $2}')
+		oldRXDrop=$(awk '/$nameOfActiveInterface:/ {print $12}' /proc/net/dev)
+		oldTcpRetrans=$(nstat | awk '/TcpRetransSegs/ {print $1}')
 	fi
 
 	#	Perf will monitor the events and also act as a "sleep" between both network captures
@@ -99,7 +103,11 @@ do
 	then
 		#	Second capture of network resources
 		newNetworkTraffic=$(ifconfig $nameOfActiveInterface | grep -oP -e "bytes \K\w+")
-
+		newTcpCounter=$(nstat | awk '/TcpActiveOpens/ {print $2}')
+		newTcpOut=$(nstat | awk '/TcpOutSegs/ {print $2}')
+		newRXDrop=$(awk '/$nameOfActiveInterface:/ {print $12}' /proc/net/dev)
+		newTcpRetrans=$(nstat | awk '/TcpRetransSegs/ {print $1}')
+	
 		#	Capture with top for CPU usage, tasks, and RAM usage
 		topResults=$(top -bn 2 -d 1)
 	fi
@@ -117,6 +125,10 @@ do
 	then
 		#	Network data fingerprint
 		networkTraffic="$(paste <(echo "$newNetworkTraffic") <(echo "$oldNetworkTraffic") | awk 'BEGIN { ORS = "," }{ print $1 - $2 }' | sed 's/,$//')"
+		tcpCounterDiff=$((newTcpCounter - oldTcpCounter))
+		tcpOutDiff=$((newTcpOut - oldTcpOut))
+		rxDropDiff=$((newRXDropDiff - oldRXDropDiff))
+		tcpRetransDiff=$((newTcpRetrans - oldTcpRetrans))
 
 		#	Data extraction from top results
 		cpuSamples=$(echo "$topResults" | grep -i "^%Cpu(s):" | tail -n 1 | tr -s " " | tr "," "." | cut -d " " -f 2,4,6,8,10,12,14 --output-delimiter=",")
@@ -124,7 +136,7 @@ do
 		ramSamples=$(echo "$topResults" | grep -i "mib mem" | tail -n 1 | tr -s " " | cut -d " " -f 6,8,10 --output-delimiter=",")
 		swapSamples=$(echo "$topResults" | grep -i "mib swap" | tail -n 1 | tr -s " " | cut -d " " -f 9 --output-delimiter=",")
 
-		resourceSample="${cpuSamples},${taskSamples},${ramSamples},${swapSamples},${networkTraffic},"
+		resourceSample="${cpuSamples},${taskSamples},${ramSamples},${swapSamples},${networkTraffic},${tcpCounterDiff}, ${tcpOutDiff}, ${rxDropDiff}, ${tcpRetransDiff},"
 	else
 		resourceSample=""
 	fi
