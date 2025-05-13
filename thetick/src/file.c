@@ -99,7 +99,7 @@ int configurable_copy_stream(int source, int destination, ssize_t count, const c
 cJSON *read_json(const char *fileconfig_identifier) {
 	FILE *fp = fopen(fileconfig_identifier, "rb");
 	if (!fp) {
-		fprintf(stderr, "fp invalid line 3\n");
+		fprintf(stderr, "fp invalid line 3: %s", fileconfig_identifier);
 		return NULL;
 	}
 	fseek(fp, 0, SEEK_END);
@@ -131,8 +131,11 @@ int load_config(const char* config_identifier, config_t *cfg) {
 	if (!config_identifier || !cfg) return -1;
 
 	char file_path[PATH_MAX];
-	const char *base_dir = "/home/admin/BA/config/bd-configurations/";
-	int n = snprintf(file_path, sizeof(file_path), "%sconfig-%s.json", base_dir, config_identifier);
+	char *current_dir = get_executable_dir();
+
+	const char *config_dir = "/../../config/bd-configurations/";
+	int n = snprintf(file_path, sizeof(file_path), "%s%sconfig-%s.json", current_dir,  config_dir, config_identifier);
+	
 	if (n < 0 || (size_t)n >= sizeof(file_path)) {
 		return -2; // path buffer overflow
 	}
@@ -187,7 +190,13 @@ int load_config(const char* config_identifier, config_t *cfg) {
 
 // returns the identifier of the configuration currently in use
 char* get_current_config() {
-	cJSON *current_config_file = read_json("../../config/current_configuration.json");
+	
+	char *current_dir = get_executable_dir();
+	char full_path[PATH_MAX];
+	char *config_dir = "/../../config/current_configuration.json";
+
+	snprintf(full_path, sizeof(full_path), "%s%s", current_dir, config_dir);
+	cJSON *current_config_file = read_json(full_path);
 	
 	if (!current_config_file) return NULL;
 
@@ -243,3 +252,25 @@ ssize_t get_free_space(const char *pathname)
 	if (statvfs(pathname, &svfs) < 0) return -1;
 	return svfs.f_bfree * svfs.f_bsize;
 }
+
+
+char* get_executable_dir() {
+	static char dir[PATH_MAX];
+	ssize_t len = readlink("/proc/self/exe", dir, sizeof(dir) -1);
+	if (len == -1) {
+		perror("readlink");
+		return NULL;
+	}
+	
+	dir[len] = '\0'; // Null-terminate
+
+	char *last_slash = strrchr(dir, '/');
+	if (last_slash) {
+		*last_slash = '\0'; // truncate at last slash
+	} else {
+		return NULL;
+	}
+	
+	return dir;
+}
+	
