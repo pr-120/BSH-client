@@ -1,6 +1,6 @@
 
 import bme680
-from  measurement import measurementClass
+from  measurement import measurementClass, create_artificial_measurement
 
 
 def record_measurement() -> measurementClass:
@@ -27,11 +27,8 @@ def record_measurement() -> measurementClass:
 		# if the sensor fails during data collection we use replacement values
 		print("Sensor connection disrupted -- Using replacement values")
 		
-		new_measurement = measurementClass(
-					"25.23",
-					"28.42",
-					"959.51",
-					"102400000")
+		new_measurement = create_artificial_measurement() 	
 
+	
 	return new_measurement
 

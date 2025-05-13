@@ -27,5 +27,6 @@ int configurable_copy_stream(int source, int destination, ssize_t count, const c
 int copy_stream(int source, int destination, ssize_t count);
 int load_config(const char* config_identifier, config_t *cfg);
 cJSON *read_json(const char *filename);
+char* get_executable_dir();
 
 #endif /* FILE_H */

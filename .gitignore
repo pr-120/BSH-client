@@ -11,5 +11,8 @@ __pycache__
 app_data.config
 preliminary_app_data.config
 
+# ignore other changes to configs
+config/*
+
 # ignore logfiles
 logfile*.txt
