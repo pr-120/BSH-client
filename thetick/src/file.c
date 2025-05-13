@@ -187,7 +187,7 @@ int load_config(const char* config_identifier, config_t *cfg) {
 
 // returns the identifier of the configuration currently in use
 char* get_current_config() {
-	cJSON *current_config_file = read_json("/home/admin/BA/config/current_configuration.json");
+	cJSON *current_config_file = read_json("../../config/current_configuration.json");
 	
 	if (!current_config_file) return NULL;
 
