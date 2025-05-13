@@ -30,10 +30,6 @@ def send_measurements_to_server(session: requests.Session) -> int:
     
     try:
         response = session.post(adjusted_url, json=body, timeout=10)
-    except requests.exceptions.ConnectionError:
-        print("Temporary connection failure, try again in next post")
-        response = "-- CONNECTION FAILURE --"
-        time.sleep(60)
     except requests.exceptions.Timeout:
         print("Request timed out, skipping this cycle")
         response = "-- TIMEOUT --"

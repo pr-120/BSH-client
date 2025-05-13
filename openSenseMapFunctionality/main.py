@@ -14,10 +14,14 @@ def main() -> None:
     session = requests.Session()
     
     while True:
-        response = send_measurements_to_server(session)
-
-        print(response, datetime.datetime.now())
-        
+	
+        try:
+            response = send_measurements_to_server(session)
+            time.sleep(RATE_LIMITS_TIME)        
+        except requests.exceptions.ConnectionError:
+            # renew session
+            session = requests.Session()
+            print("-- CONNECTION FAILURE --")
         time.sleep(RATE_LIMITS_TIME)
 
 
