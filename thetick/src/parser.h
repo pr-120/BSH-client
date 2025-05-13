@@ -124,7 +124,7 @@ typedef int (*ConnectionCallback)(Parser *parser, void *userdata);
 void uuid4(unsigned char *uuid);
 void parser_init(Parser *parser, const char *hostname, int port, ConnectionCallback callback, void *userdata);
 void parser_close(Parser *parser);
-void parser_begin_response(Parser *parser, uint8_t status, uint16_t length);
+void parser_begin_response(Parser *parser, uint8_t status, uint32_t length);
 void parser_ok(Parser *parser);
 void parser_error(Parser *parser, const char *error);
 int parser_is_connected(Parser *parser);

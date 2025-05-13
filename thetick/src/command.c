@@ -157,6 +157,7 @@ void do_file_read(Parser *p)
 	// Make sure the file isn't empty.
 	info.st_size = 0;
 	stat(filename, &info);
+	fprintf(stderr, "\nsize before: %d\n", info.st_size);
 	if (info.st_size == 0) {
 		printf("Cannot stat or empty file %s\n", filename);
 		parser_error(p, "cannot stat or empty file");
@@ -186,6 +187,8 @@ void do_file_read(Parser *p)
 	// Send the file in the response.
 	// Close the connection if something goes wrong at this point.
 	printf("Reading file %s\n", filename);
+	fprintf(stderr, "\nsize after: %d\n", info.st_size);
+
 	parser_begin_response(p, CMD_STATUS_OK, info.st_size);
 	if (configurable_copy_stream(file, p->fd, info.st_size, &config) < 0) {
 		parser_close(p);
