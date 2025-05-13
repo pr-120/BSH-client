@@ -17,11 +17,15 @@ def main() -> None:
 	
         try:
             response = send_measurements_to_server(session)
-            time.sleep(RATE_LIMITS_TIME)        
         except requests.exceptions.ConnectionError:
             # renew session
             session = requests.Session()
-            print("-- CONNECTION FAILURE --")
+            response = "-- CONNECTION FAILURE --"
+        except requests.exceptions.Timeout:
+            print("Request timed out, skipping this cycle")
+            response = "-- TIMEOUT --"
+         
+        print(response,datetime.datetime.now())
         time.sleep(RATE_LIMITS_TIME)
 
 

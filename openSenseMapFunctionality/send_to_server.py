@@ -28,10 +28,7 @@ def send_measurements_to_server(session: requests.Session) -> int:
             GAS_RESISTANCE_SENSOR_ID: [measurement.gas_resistance]
             }
     
-    try:
-        response = session.post(adjusted_url, json=body, timeout=10)
-    except requests.exceptions.Timeout:
-        print("Request timed out, skipping this cycle")
-        response = "-- TIMEOUT --"
+    response = session.post(adjusted_url, json=body, timeout=10) 
+
     return response
 
