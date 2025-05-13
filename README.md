@@ -14,3 +14,19 @@ The configuration folder contain the `folder_paths.config` and `preliminary_app_
 The `preliminary_app_data.config` contains filler values which define how the client device interacts with the C&C server as well as the openSenseMap application. The ip address as well as the port at which the remote shell is listening on the C&C server must be adjusted for individual use. Additionally the ID of the sensor given by the openSenseMap must be added as well as the IDs of the individual sensor parts. Without this the client device cannot upload the data and simulate the workings of an IoT device.
 
 !IMPORTANT!: After adding this information to the `preliminary_app_data.config` file, the file must be renamed. The application expects the file to be called `app_data.config`.
+
+## BACKDOOR (THE TICK)
+
+The backdoor is located in the folder `thetick`. The structure of this folder is self-explanatory, however there are a few things to be aware of when using the backdoor. The files which can be exfiltrated are limited by file-size. Files must be smaller than int32 meaning around 4GB. If support for files larger than this limit is required, the limit can be adjusted in `src\parser.c` in the *parser_begin_response()* function.
+
+"""
+// Send a command response header. Data should be sent by the caller.
+void parser_begin_response(Parser *parser, uint8_t status, uint32_t length)
+{
+    RESP_HEADER resp;
+
+    resp.status = status;
+    resp.data_len = htonl(length);
+    send_block(parser->fd, (const char *) &resp, sizeof(resp));
+}
+"""
