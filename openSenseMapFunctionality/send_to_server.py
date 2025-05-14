@@ -1,4 +1,4 @@
-from return_measurements import record_measurement
+from measurement import record_measurement, measurementClass
 import requests
 from dotenv import load_dotenv
 import os
@@ -15,12 +15,10 @@ TEMPERATURE_SENSOR_ID = os.getenv("temperature_sensor_id")
 AIR_PRESSURE_SENSOR_ID = os.getenv("air_pressure_sensor_id")
 GAS_RESISTANCE_SENSOR_ID = os.getenv("gas_resistance_sensor_id")
 
-def send_measurements_to_server(session: requests.Session) -> int:
+def send_measurements_to_server(session: requests.Session, measurement: measurementClass) -> int:
 
     opensensemap_url = "https://api.opensensemap.org/boxes/"
     adjusted_url = opensensemap_url + SENSE_BOX_ID + "/data"
-
-    measurement = record_measurement()
 
     body = {HUMIDITY_SENSOR_ID: [measurement.humidity],
             TEMPERATURE_SENSOR_ID: [measurement.temperature],

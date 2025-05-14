@@ -1,5 +1,7 @@
 
 import bme680
+from bme680 import BME680
+
 from  measurement import measurementClass, create_artificial_measurement
 
 
