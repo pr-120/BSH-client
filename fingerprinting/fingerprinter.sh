@@ -10,7 +10,9 @@
 
 # load app data
 SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
-. $SCRIPT_DIR/../config/app_data.config
+CONFIG_FOLDER="$SCRIPT_DIR/../config"
+. $CONFIG_FOLDER/app_data.config
+
 
 server=$ip_of_server
 port=$port_of_api
@@ -19,7 +21,8 @@ route="/fp/"
 mac=$( cat /sys/class/net/eth0/address | tr : _ ) # find MAC address and replace ":" with "_" for usage in route
 
 # remove finished flag
-rm -f /home/admin/BA/config/fp_done.flag
+echo $CONFIG_FOLDER
+rm -f $CONFIG_FOLDER/fp_done.flag
 
 #	Temperature monitoring
 temperatureMonitor=true
@@ -192,7 +195,7 @@ then
   echo "Sent $current fingerprints in total"
  
   # create finish flag which signals that fp is finished
-  echo "fp finished successfully" > /home/admin/BA/config/fp_done.flag
+  echo "fp finished successfully" > $CONFIG_FOLDER/fp_done.flag
 fi
 
 
