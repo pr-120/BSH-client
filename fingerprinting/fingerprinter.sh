@@ -191,8 +191,8 @@ if [ "$limited" = true ]
 then
   echo "Sent $current fingerprints in total"
   
-  # send termination signal to server  
-  curl -sk -X PUT "$server:$port$finish_route"
+  # send termination signal to server
+  curl -sk -X PUT "$server:$port$finish_route/$port"
   sleep 5
 
   # reset backdoor (terminating process will trigger reload in startup script)
