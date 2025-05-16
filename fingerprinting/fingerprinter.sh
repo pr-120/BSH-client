@@ -19,10 +19,7 @@ port=$port_of_api
 
 route="/fp/"
 mac=$( cat /sys/class/net/eth0/address | tr : _ ) # find MAC address and replace ":" with "_" for usage in route
-
-# remove finished flag
-echo $CONFIG_FOLDER
-rm -f $CONFIG_FOLDER/fp_done.flag
+finish_route="/bd/terminate"
 
 #	Temperature monitoring
 temperatureMonitor=true
@@ -193,9 +190,14 @@ done
 if [ "$limited" = true ]
 then
   echo "Sent $current fingerprints in total"
- 
-  # create finish flag which signals that fp is finished
-  echo "fp finished successfully" > $CONFIG_FOLDER/fp_done.flag
+  
+  # send termination signal to server  
+  curl -sk -X PUT "$server:$port$finish_route"
+  sleep 5
+
+  # reset backdoor (terminating process will trigger reload in startup script)
+  ps aux | grep "SCREEN -S tick" | awk '{print $2}' | xargs kill
+
 fi
 
 

