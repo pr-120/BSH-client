@@ -6,6 +6,7 @@ while true; do
 	
 	for line in $(cat "$SCRIPT_DIR/link_file.txt"); do
 		# send requests to sites to simulate network usage
+		echo "pinging $line..."
 		curl -s "$line" > /dev/null
 		sleep 0.3
 	done
