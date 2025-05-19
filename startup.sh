@@ -4,7 +4,7 @@
 ############# CONFIGURATION ##########################
 
 # parse options
-benign_processes_active=false
+benign_process_active=false
 while getopts "b" opt; do
 	case $opt in
 		b) benign_process_active=true ;;
@@ -18,6 +18,10 @@ shift $((OPTIND-1))
 cleanup() {
 	printf "\nCaught termination signal. Killing openSenseMap recording\n"
 	screen -ls | grep "openSenseMap" | awk '{print $1}' | xargs -r -I {} screen -S {} -X quit
+	
+	if [ "$benign_process_active" = true ]; then
+		ps aux | grep -P "SCREEN -dmS .+_bb" | awk '{print $2}' | xargs sudo kill 2>/dev/null
+	fi
 
 	# attempt to kill any fingerprinting processes still running (should be done)
 	ps aux | grep "SCREEN -dmS fingerprinting" | awk '{print $2}' | xargs sudo kill 2>/dev/null
@@ -46,8 +50,8 @@ screen -dmS openSenseMap -L -Logfile ./logfile.txt $openSenseMap_folder/start_op
 
 # start additional benign behavior if option given
 if [ "$benign_process_active" = true ]; then
-	bash package_installation_behavior.sh
-	bash ping_behavior.sh 	
+	screen -dmS package_installation_bb bash $benign_behaviors_folder/package_installation_behavior.sh
+	screen -dmS ping_bb bash $benign_behaviors_folder/ping_behavior.sh 	
 fi
 
 
