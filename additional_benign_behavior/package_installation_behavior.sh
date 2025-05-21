@@ -14,7 +14,7 @@ while true; do
 
 	# install requirements without caching
 	echo "installing requirements..."
-	pip install -r $path_to_requirements --no-cache-dir --quiet
+	pip install -r $path_to_requirements --no-cache-dir
 	echo "done"
 	
 	# uninstall all packages

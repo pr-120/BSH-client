@@ -71,22 +71,14 @@ int configurable_copy_stream(int source, int destination, ssize_t count, const c
 		bytesWritten += config->bufferSize;
 
 		fprintf(stderr, "Total bytes written: %d\n", bytesWritten);
-
-		// if it was the last block we skip the pause
-		if (count < 0 || copied < count) {
-			//struct timespec req;
-			//req.tv_sec = config->burstPause;
 			
-			// if the burstDuration is reached we pause for a longer time
-			if (counter % config->burstDuration == 0) {
-				//req.tv_nsec = config->burstPause * 1000000000;
-				sleep(config->burstPause);
-			}
-			// else take a normal requestInterval pause
-			else {
-				sleep(config->transferFrequency);
-			}
-			//nanosleep(&req, NULL);
+		// if the burstDuration is reached we pause for a longer time
+		if (counter % config->burstDuration == 0) {
+			sleep(config->burstPause);
+		}
+		// else take a normal requestInterval pause
+		else {
+			sleep(config->transferFrequency);
 		}
 	}
 
