@@ -16,3 +16,6 @@ config/*
 
 # ignore logfiles
 logfile*.txt
+
+# ignore IDE folders
+.idea
