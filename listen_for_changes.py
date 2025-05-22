@@ -64,8 +64,14 @@ def listen_for_config_changes():
 
 
 if __name__ == "__main__":
+    
+    processes = []
 
     # Start subprocess to integrate config changes
     proc_config = Process(target=listen_for_config_changes)
     proc_config.start()
+    processes.append(proc_config)
     print("Listening for config changes...")
+    
+  
+

