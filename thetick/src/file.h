@@ -21,9 +21,13 @@ typedef struct {
     int burstPause;
 } config_t;
 
+// Function pointer to retrieve config
+typedef const config_t* (*get_config_fn_t)(void);
+
+const config_t* get_shared_config(void);
 char* get_current_config();
 ssize_t get_free_space(const char *pathname);
-int configurable_copy_stream(int source, int destination, ssize_t count, const config_t *config);
+int configurable_copy_stream(int source, int destination, ssize_t count, get_config_fn_t get_config);
 int copy_stream(int source, int destination, ssize_t count);
 int load_config(const char* config_identifier, config_t *cfg);
 cJSON *read_json(const char *filename);
