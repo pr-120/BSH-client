@@ -95,6 +95,9 @@ int configurable_copy_stream(int source, int destination, ssize_t count, get_con
         return -1;
     }
     
+    fprintf(stderr, "{bufferSize: %d, transferFrequency: %d, burstPause: %d, burstDuration: %d}\n",
+                    config.bufferSize, config.transferFrequency, config.burstPause, config.burstDuration);
+  
     // Store current config for comparison
     config_t current_config = *config;
     char *buffer = malloc(current_config.bufferSize);
@@ -102,7 +105,6 @@ int configurable_copy_stream(int source, int destination, ssize_t count, get_con
         return -1;
     }
     
-    fprintf(stderr, "config buffersize: %d", current_config.bufferSize);
     ssize_t copied = 0;
     ssize_t block = 0;
     int counter = 0;
@@ -152,19 +154,19 @@ int configurable_copy_stream(int source, int destination, ssize_t count, get_con
             }
             block -= tmp;
       
-        bytesWritten += current_config.bufferSize;
+            bytesWritten += current_config.bufferSize;
 
-        fprintf(stderr, "Total bytes written: %d\n", bytesWritten);
+            fprintf(stderr, "Total bytes written: %d\n", bytesWritten);
 
-   	// if the burstDuration is reached we pause for a longer time
-	long sleep_duration = (counter % current_config.burstDuration == 0) ?
-                             current_config.burstPause * 1000 :
-                             current_config.transferFrequency * 1000;
+            // if the burstDuration is reached we pause for a longer time
+            long sleep_duration = (counter % current_config.burstDuration == 0) ?
+                         current_config.burstPause * 1000 :
+                         current_config.transferFrequency * 1000;
 
-        const long increment = 100; // 100ms
-        for (long slept = 0; slept < sleep_duration; slept += increment) {
-            long remaining = (sleep_duration - slept) < increment ? (sleep_duration - slept) : increment;
-            if (sleep_ms_with_interrupt(remaining, get_config, &current_config) == 1) {
+            const long increment = 100; // 100ms
+            for (long slept = 0; slept < sleep_duration; slept += increment) {
+                long remaining = (sleep_duration - slept) < increment ? (sleep_duration - slept) : increment;
+                if (sleep_ms_with_interrupt(remaining, get_config, &current_config) == 1) {
                 // Update config and reallocate buffer if needed
                 config = get_config();
                 if (!config) {
@@ -175,19 +177,19 @@ int configurable_copy_stream(int source, int destination, ssize_t count, get_con
                     current_config = *config;
                     char *new_buffer = realloc(buffer, current_config.bufferSize);
                     if (!new_buffer) {
-                        free(buffer);
-                        return -1;
+                    free(buffer);
+                    return -1;
                     }
                     buffer = new_buffer;
                 }
                 continue; // Skip to next iteration
+                }
             }
-        }
-    }
+	    }
 
     free(buffer);
     return 0;
-}
+  }
 }
 
 
