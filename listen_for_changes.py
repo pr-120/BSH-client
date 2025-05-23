@@ -42,7 +42,7 @@ def update_existing_config(new_config):
         buffer_size = int(new_config["buffer_size"])
         burst_duration = int(new_config["burst_duration"])
         burst_pause = int(new_config["burst_pause"])
-        transfer_frequency = int(new_config["transfer_frequency"])
+        transfer_frequency = int(float(new_config["transfer_frequency"]) * 1000)  # save frequency in ms
         if buffer_size <= 0:
             return
     except (ValueError, TypeError):

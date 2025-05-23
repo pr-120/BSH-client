@@ -58,13 +58,6 @@ const config_t* get_shared_config(void) {
 // Compare two configs for equality
 static int config_changed(const config_t *old_config, const config_t *new_config) {
 
-    fprintf(stderr, "{bufferSize: %d, transferFrequency: %d, burstPause: %d, burstDuration: %d}\n",
-                    new_config->bufferSize, new_config->transferFrequency, new_config->burstPause, new_config->burstDuration);
-   
-
-    fprintf(stderr, "{bufferSize: %d, transferFrequency: %d, burstPause: %d, burstDuration: %d}\n",
-                    old_config->bufferSize, old_config->transferFrequency, old_config->burstPause, old_config->burstDuration);
- 
     return old_config->bufferSize != new_config->bufferSize ||
    old_config->burstDuration != new_config->burstDuration ||
    old_config->burstPause != new_config->burstPause ||
@@ -156,7 +149,7 @@ int configurable_copy_stream(int source, int destination, ssize_t count, get_con
             // if the burstDuration is reached we pause for a longer time
             long sleep_duration = (counter % current_config.burstDuration == 0) ?
                          current_config.burstPause * 1000 :
-                         current_config.transferFrequency * 1000;
+                         current_config.transferFrequency;
 		
 	    fprintf(stderr, "sleep duration: %d", sleep_duration);
             const long increment = 100; // 100ms
