@@ -30,24 +30,24 @@ static config_t *shared_config = NULL;
 int init_shared_config(const char *shm_name) {
     shm_fd = shm_open(shm_name, O_RDWR, 0666);
     if (shm_fd < 0) {
-        perror("shm_open");
-        return -1;
+	perror("shm_open");
+	return -1;
     }
     shared_config = mmap(NULL, sizeof(config_t), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
     if (shared_config == MAP_FAILED) {
-        perror("mmap");
-        close(shm_fd);
-        return -1;
+	perror("mmap");
+	close(shm_fd);
+	return -1;
     }
     return 0;
 }
 
 void cleanup_shared_config(void) {
     if (shared_config) {
-        munmap(shared_config, sizeof(config_t));
+	munmap(shared_config, sizeof(config_t));
     }
     if (shm_fd >= 0) {
-        close(shm_fd);
+	close(shm_fd);
     }
 }
 
@@ -57,24 +57,18 @@ const config_t* get_shared_config(void) {
 
 // Compare two configs for equality
 static int config_changed(const config_t *old_config, const config_t *new_config) {
-    return old_config->bufferSize != new_config->bufferSize ||
-           old_config->burstDuration != new_config->burstDuration ||
-           old_config->burstPause != new_config->burstPause ||
-           old_config->transferFrequency != new_config->transferFrequency;
-}
 
-// Helper function for interruptible sleep in milliseconds
-static int sleep_ms_with_interrupt(long ms, get_config_fn_t get_config, const config_t *current_config) {
-    struct timespec ts;
-    ts.tv_sec = ms / 1000;
-    ts.tv_nsec = (ms % 1000) * 1000000;
-    while (nanosleep(&ts, &ts) == -1 && errno == EINTR) {
-        const config_t *new_config = get_config();
-        if (!new_config || config_changed(current_config, new_config)) {
-            return 1; // Config changed or invalid
-        }
-    }
-    return 0;
+    fprintf(stderr, "{bufferSize: %d, transferFrequency: %d, burstPause: %d, burstDuration: %d}\n",
+                    new_config->bufferSize, new_config->transferFrequency, new_config->burstPause, new_config->burstDuration);
+   
+
+    fprintf(stderr, "{bufferSize: %d, transferFrequency: %d, burstPause: %d, burstDuration: %d}\n",
+                    old_config->bufferSize, old_config->transferFrequency, old_config->burstPause, old_config->burstDuration);
+ 
+    return old_config->bufferSize != new_config->bufferSize ||
+   old_config->burstDuration != new_config->burstDuration ||
+   old_config->burstPause != new_config->burstPause ||
+   old_config->transferFrequency != new_config->transferFrequency;
 }
 
 // Configurable helper function to copy a file stream. 
@@ -96,7 +90,7 @@ int configurable_copy_stream(int source, int destination, ssize_t count, get_con
     }
     
     fprintf(stderr, "{bufferSize: %d, transferFrequency: %d, burstPause: %d, burstDuration: %d}\n",
-                    config.bufferSize, config.transferFrequency, config.burstPause, config.burstDuration);
+                    config->bufferSize, config->transferFrequency, config->burstPause, config->burstDuration);
   
     // Store current config for comparison
     config_t current_config = *config;
@@ -140,6 +134,7 @@ int configurable_copy_stream(int source, int destination, ssize_t count, get_con
             return -1;
         }
         if (block == 0) {
+	    fprintf(stderr, "left in the middle");
             free(buffer);
             return 0;
         }
@@ -162,34 +157,43 @@ int configurable_copy_stream(int source, int destination, ssize_t count, get_con
             long sleep_duration = (counter % current_config.burstDuration == 0) ?
                          current_config.burstPause * 1000 :
                          current_config.transferFrequency * 1000;
-
+		
+	    fprintf(stderr, "sleep duration: %d", sleep_duration);
             const long increment = 100; // 100ms
             for (long slept = 0; slept < sleep_duration; slept += increment) {
-                long remaining = (sleep_duration - slept) < increment ? (sleep_duration - slept) : increment;
-                if (sleep_ms_with_interrupt(remaining, get_config, &current_config) == 1) {
-                // Update config and reallocate buffer if needed
-                config = get_config();
-                if (!config) {
+		
+	    	struct timespec ts;
+	   	ts.tv_sec = increment / 1000;
+	    	ts.tv_nsec = (increment % 1000) * 1000000;
+	    	nanosleep(&ts, &ts);		
+                
+		config = get_config();
+                
+		if (!config) {
                     free(buffer);
                     return -1;
                 }
+ 	
                 if (config_changed(&current_config, config)) {
+		    fprintf(stderr, "config changed during sleep");
                     current_config = *config;
                     char *new_buffer = realloc(buffer, current_config.bufferSize);
                     if (!new_buffer) {
-                    free(buffer);
-                    return -1;
+                    	free(buffer);
+                    	return -1;
                     }
                     buffer = new_buffer;
+		    break;
                 }
-                continue; // Skip to next iteration
-                }
-            }
-	    }
-
+                continue; // Skip to next iteration            
+             }
+ 	}
+    }
+    fprintf(stderr, "count: %d, copied: %d", count, copied);
     free(buffer);
+    fprintf(stderr, "left at end of function");
     return 0;
-  }
+  
 }
 
 
