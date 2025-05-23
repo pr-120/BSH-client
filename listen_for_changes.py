@@ -4,6 +4,7 @@ import struct
 from json import loads
 from multiprocessing import Process
 from socket import AF_INET, SOCK_STREAM, socket
+import sys
 
 
 # Config struct format (matches C config_t)
