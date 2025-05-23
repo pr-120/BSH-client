@@ -171,19 +171,6 @@ void do_file_read(Parser *p)
 		return;
 	}
 
-	config_t config;
-
-	char *cfg_id = get_current_config();
-	int config_load_status = load_config(cfg_id, &config); 
-
-	// loads the config used currently into the config struct 
-	if (!cfg_id || config_load_status != 0) {
-		fprintf(stderr, "\nFailed to read config\n");
-		free(cfg_id);
-		return;
-	}
-	free(cfg_id); // free after successful load
-
 	// Send the file in the response.
 	// Close the connection if something goes wrong at this point.
 	printf("Reading file %s\n", filename);
