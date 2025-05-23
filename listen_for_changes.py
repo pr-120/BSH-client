@@ -12,6 +12,22 @@ CONFIG_SIZE = struct.calcsize(CONFIG_FORMAT)
 # Global shared memory
 shm = None
 
+server_socket = None
+
+
+def cleanup(signum, frame):
+    global shm, server_socket
+    if server_socket:
+        server_socket.close()
+    if shm:
+        shm.close()
+        shm.unlink()
+    sys.exit(0)
+
+# execute cleanup function when script is terminated
+signal.signal(signal.SIGTERM, cleanup)
+signal.signal(signal.SIGINT, cleanup)
+
 def update_existing_config(new_config):
     """Update shared memory with JSON config."""
     global shm
@@ -47,7 +63,9 @@ def update_existing_config(new_config):
 
 
 def listen_for_config_changes():
+    global server_socket
     with socket(AF_INET, SOCK_STREAM) as sock:
+        server_socket = sock
         sock.bind(("0.0.0.0", 42666))
         sock.listen(1)
 
