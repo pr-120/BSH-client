@@ -1,3 +1,4 @@
+import signal
 import multiprocessing.shared_memory
 import struct
 from json import loads
@@ -59,7 +60,6 @@ def update_existing_config(new_config):
     # Update shared memory
     config_data = struct.pack(CONFIG_FORMAT, buffer_size, burst_duration, burst_pause, transfer_frequency)
     shm.buf[:CONFIG_SIZE] = config_data
-    print(config_data)
 
 
 def listen_for_config_changes():
@@ -77,7 +77,7 @@ def listen_for_config_changes():
                     if not data:
                         break
                     new_config = loads(data.decode(encoding="utf-8"))
-                    print("received", new_config)
+                    print("received", new_config, "\n")
                     update_existing_config(new_config)
 
 
@@ -89,7 +89,7 @@ if __name__ == "__main__":
     proc_config = Process(target=listen_for_config_changes)
     proc_config.start()
     processes.append(proc_config)
-    print("Listening for config changes...")
+    print("Listening for config changes...\n")
     
   
 

