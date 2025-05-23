@@ -57,7 +57,7 @@ def update_existing_config(new_config):
                 name="current_config", create=False, size=CONFIG_SIZE
             )
     # Update shared memory
-    config_data = struct.pack(CONFIG_FORMAT, buffer_size, burst_duration, burst_pause, transfer_frequency)
+    config_data = struct.pack(CONFIG_FORMAT, buffer_size, transfer_frequency, burst_duration, burst_pause)
     shm.buf[:CONFIG_SIZE] = config_data
     print(config_data)
 
