@@ -1,4 +1,5 @@
-./fingerprinting/.venv
+# ignore .o files
+*.o
 
 # ignore all fingerprint files
 fp-*
