@@ -7,7 +7,6 @@ from socket import AF_INET, SOCK_STREAM, socket
 import sys
 import subprocess
 
-
 # Config struct format (matches C config_t)
 CONFIG_FORMAT = 'iiii'
 CONFIG_SIZE = struct.calcsize(CONFIG_FORMAT)
@@ -18,12 +17,13 @@ shm = None
 config_socket = None
 fp_socket = None
 
+
 def cleanup(signum, frame):
     global shm, config_socket
     if config_socket:
         config_socket.close()
     if fp_socket:
-	fp_socket.close()
+        fp_socket.close()
     if shm:
         shm.close()
         shm.unlink()
@@ -33,6 +33,7 @@ def cleanup(signum, frame):
 # execute cleanup function when script is terminated
 signal.signal(signal.SIGTERM, cleanup)
 signal.signal(signal.SIGINT, cleanup)
+
 
 def update_existing_config(new_config):
     """Update shared memory with JSON config."""
@@ -89,7 +90,7 @@ def listen_for_config_changes():
 def listen_terminate_fingerprinting():
     global fp_socket
     with socket(AF_INET, SOCK_STREAM) as sock:
-	fp_socket = sock
+        fp_socket = sock
         sock.bind(("0.0.0.0", 42667))
         sock.listen(1)
 
@@ -97,13 +98,13 @@ def listen_terminate_fingerprinting():
             conn, addr = sock.accept()  # keep listening for new connections
             with conn:
                 while True:
-			subprocess.call("ps aux | grep 'SCREEN -dmS fingerprinting' | awk '{print $2}' | xargs sudo kill 2>/dev/null", 
-					shell=True, check=True
-			)
+                    subprocess.call(
+                        "ps aux | grep 'SCREEN -dmS fingerprinting' | awk '{print $2}' | xargs sudo kill 2>/dev/null",
+                        shell=True, check=True
+                        )
 
 
 if __name__ == "__main__":
-    
     processes = []
 
     # Start subprocess to integrate config changes
@@ -111,10 +112,8 @@ if __name__ == "__main__":
     proc_config.start()
     processes.append(proc_config)
     print("Listening for config changes...\r")
-    
+
     proc_terminate_fp = Process(target=listen_terminate_fingerprinting)
     proc_terminate_fp.start()
     processes.append(proc_terminate_fp)
     print("Listen for fp termination")
-     
-
