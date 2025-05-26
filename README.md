@@ -1,5 +1,10 @@
 # BSH-client
-Client side of BSH application
+Bachelor thesis on Backdoor Optimized with RL for Resource-constrained devices.
+The official title of this thesis is *AI-powered Backdoor to stay hidden* (**BSH** from here on out).
+
+It is generally advised to first consult the corresponding report of this master thesis. The report motivates the thesis and introduces the required background. It further explains the development, and reasoning of the backdoor extension in great detail.
+
+This repository contains the underlying backdoor of the thesis. There is another repository for the RL Agent and command and control (C&C) part.
 
 # INSTALLATION
 The application can be installed by executing the `installation.sh` script located in the root of the application. The python virtual environment needed for the openSenseMap will be installed as well as any other system packages needed. As the application was designed for raspberry Pis which used the Debian 12 (bookworm) distribution, the only necessary package was the `libcurl4-openssl-dev`. When using another distribution the user might need to install any additional necessary packages. Additionally, the code for the backdoor is compiled in `thetick\src`. If any changes are made to the files in this folder the user will need to recompile by executing """make clean\n make""".
