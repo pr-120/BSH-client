@@ -10,7 +10,7 @@
 
 # load app data
 SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
-CONFIG_FOLDER="$SCRIPT_DIR/../config"
+CONFIG_FOLDER="$SCRIPT_DIR/config"
 . $CONFIG_FOLDER/app_data.config
 
 
