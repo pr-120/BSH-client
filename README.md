@@ -3,7 +3,7 @@
 Bachelor thesis on Backdoor Optimized with RL for Resource-constrained devices.
 The official title of this thesis is *AI-powered Backdoor to stay hidden* (**BSH** from here on out).
 
-It is generally advised to first consult the corresponding report of this master thesis. The report motivates the thesis
+It is generally advised to first consult the corresponding report of this bachelor thesis. The report motivates the thesis
 and introduces the required background. It further explains the development, and reasoning of the backdoor extension in
 great detail.
 
