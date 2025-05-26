@@ -101,7 +101,7 @@ def listen_terminate_fingerprinting():
                     subprocess.call(
                         "ps aux | grep 'SCREEN -dmS fingerprinting' | awk '{print $2}' | xargs sudo kill 2>/dev/null",
                         shell=True)
-                    print("subprocess called")		
+                    break
 
 
 if __name__ == "__main__":
