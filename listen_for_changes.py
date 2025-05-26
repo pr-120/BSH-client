@@ -82,7 +82,7 @@ def listen_for_config_changes():
                     if not data:
                         break
                     new_config = loads(data.decode(encoding="utf-8"))
-                    print("received", new_config, "\n")
+                    print("received", new_config, "\r")
                     update_existing_config(new_config)
 
 
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     proc_config = Process(target=listen_for_config_changes)
     proc_config.start()
     processes.append(proc_config)
-    print("Listening for config changes...\n")
+    print("Listening for config changes...\r")
     
     proc_terminate_fp = Process(target=listen_terminate_fingerprinting)
     proc_terminate_fp.start()

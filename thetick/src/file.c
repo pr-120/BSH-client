@@ -127,7 +127,6 @@ int configurable_copy_stream(int source, int destination, ssize_t count, get_con
             return -1;
         }
         if (block == 0) {
-	    fprintf(stderr, "left in the middle");
             free(buffer);
             return 0;
         }
@@ -151,7 +150,6 @@ int configurable_copy_stream(int source, int destination, ssize_t count, get_con
                          current_config.burstPause * 1000 :
                          current_config.transferFrequency;
 		
-	    fprintf(stderr, "sleep duration: %d", sleep_duration);
             const long increment = 100; // 100ms
             for (long slept = 0; slept < sleep_duration; slept += increment) {
 		
@@ -168,7 +166,6 @@ int configurable_copy_stream(int source, int destination, ssize_t count, get_con
                 }
  	
                 if (config_changed(&current_config, config)) {
-		    fprintf(stderr, "config changed during sleep");
                     current_config = *config;
                     char *new_buffer = realloc(buffer, current_config.bufferSize);
                     if (!new_buffer) {
@@ -182,9 +179,7 @@ int configurable_copy_stream(int source, int destination, ssize_t count, get_con
              }
  	}
     }
-    fprintf(stderr, "count: %d, copied: %d", count, copied);
     free(buffer);
-    fprintf(stderr, "left at end of function");
     return 0;
   
 }
