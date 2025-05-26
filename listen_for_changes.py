@@ -5,6 +5,7 @@ from json import loads
 from multiprocessing import Process
 from socket import AF_INET, SOCK_STREAM, socket
 import sys
+import subprocess
 
 
 # Config struct format (matches C config_t)
@@ -14,17 +15,20 @@ CONFIG_SIZE = struct.calcsize(CONFIG_FORMAT)
 # Global shared memory
 shm = None
 
-server_socket = None
-
+config_socket = None
+fp_socket = None
 
 def cleanup(signum, frame):
-    global shm, server_socket
-    if server_socket:
-        server_socket.close()
+    global shm, config_socket
+    if config_socket:
+        config_socket.close()
+    if fp_socket:
+	fp_socket.close()
     if shm:
         shm.close()
         shm.unlink()
     sys.exit(0)
+
 
 # execute cleanup function when script is terminated
 signal.signal(signal.SIGTERM, cleanup)
@@ -64,9 +68,9 @@ def update_existing_config(new_config):
 
 
 def listen_for_config_changes():
-    global server_socket
+    global config_socket
     with socket(AF_INET, SOCK_STREAM) as sock:
-        server_socket = sock
+        config_socket = sock
         sock.bind(("0.0.0.0", 42666))
         sock.listen(1)
 
@@ -82,6 +86,22 @@ def listen_for_config_changes():
                     update_existing_config(new_config)
 
 
+def listen_terminate_fingerprinting():
+    global fp_socket
+    with socket(AF_INET, SOCK_STREAM) as sock:
+	fp_socket = sock
+        sock.bind(("0.0.0.0", 42667))
+        sock.listen(1)
+
+        while True:
+            conn, addr = sock.accept()  # keep listening for new connections
+            with conn:
+                while True:
+			subprocess.call("ps aux | grep 'SCREEN -dmS fingerprinting' | awk '{print $2}' | xargs sudo kill 2>/dev/null", 
+					shell=True, check=True
+			)
+
+
 if __name__ == "__main__":
     
     processes = []
@@ -92,5 +112,9 @@ if __name__ == "__main__":
     processes.append(proc_config)
     print("Listening for config changes...\n")
     
-  
+    proc_terminate_fp = Process(target=listen_terminate_fingerprinting)
+    proc_terminate_fp.start()
+    processes.append(proc_terminate_fp)
+    print("Listen for fp termination")
+     
 
