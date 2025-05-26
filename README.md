@@ -31,7 +31,7 @@ additional [setup](waveshare.com/wiki/BME680_Environmental_Sensor#Python) steps.
 
 | File                    | Contains                                                                                                                                    |
 |-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| `fingerprinter.sh`      | Contains all functionality of recording and sending fingerprints to C&C                                                                     |
+| `fingerprinter.sh`      | Contains all functionality of recording and sending fingerprints to C&C. Must be executed as root.                                          |
 | `listen_for_changes.py` | Creates sockets for commands from the C&C regarding configuration changes or to stop fingerprinting                                         |
 | `startup.sh`            | Key script that starts all other necessary processes on client device. When the `-b` flag is given additional benign behaviors are started. |
 | `installation.sh`       | Automates installation and compilation process for a clean and effortless setup of the application                                          |
