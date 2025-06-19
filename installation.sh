@@ -10,6 +10,8 @@ SCRIPT_DIR="$(dirname "$BASH_SOURCE[0]}")"
 
 ##########################################
 
+# exclude config file from git pull, otherwise default values are restored
+git update-index --assume-unchanged $SCRIPT_DIR/config/app_data.config
 
 # install virtual environment for openSenseMap functionality
 python -m venv $openSenseMap_folder/.venv
@@ -32,5 +34,3 @@ make
 # install packages for sensor
 sudo apt-get install i2c-tools
 
-# exclude config file from git pull, otherwise default values are restored
-git update-index --assume-unchanged $SCRIPT_DIR/config/app_data.config
