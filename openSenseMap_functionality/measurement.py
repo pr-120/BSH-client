@@ -14,7 +14,7 @@ class measurementClass:
 def init_sensor() -> bme680.BME680:
     """Initialize and return a BME680 sensor instance."""
     try:
-        sensor = bme680.BME680(bme680.I2C_ADDR_PRIMARY)
+        sensor = bme680.BME680(bme680.I2C_ADDR_SECONDARY)
     except RuntimeError:
         sensor = bme680.BME680(bme680.I2C_ADDR_SECONDARY)
     print("*** Sensor initialized ***")
